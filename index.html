@@ -177,10 +177,15 @@
                 for (let i = 0; i < chunk.length; i++) {
                     rawText += chunk[i]; 
                     
-                    aiBubble.innerHTML = marked.parse(rawText); 
-                    
-                    let delay = Math.floor(Math.random() * (25 - 10 + 1)) + 10;
-                    if (['.', '!', '?', '،', ','].includes(chunk[i])) delay = 100;
+                    // التعديل اللي إنت طلبته لفصل المتغيرات ووضوح الكود
+                    const formattedText = marked.parse(rawText);
+                    aiBubble.innerHTML = formattedText; 
+
+                    // تأثير الكتابة الطبيعي (Natural Flow) اللي بيخلي الموقع احترافي
+                    let delay = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
+                    if (['.', '!', '?', '،', ','].includes(chunk[i])) {
+                        delay = 150; // وقفة أطول عند علامات الترقيم
+                    }
 
                     await sleep(delay); 
                     chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -213,3 +218,4 @@
 
 </body>
 </html>
+
