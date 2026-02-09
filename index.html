@@ -127,18 +127,18 @@
     const chatWindow = document.getElementById('chat-window');
     const typingIndicator = document.getElementById('typing-indicator');
 
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
     async function askAI() {
         const inputField = document.getElementById('userInput');
         const text = inputField.value.trim();
         if (!text) return;
-
 
         appendMessage('user', text);
         inputField.value = '';
         
         typingIndicator.style.display = 'block';
         chatWindow.scrollTop = chatWindow.scrollHeight;
-
 
         const aiMessageRow = document.createElement('div');
         aiMessageRow.className = `message-row ai-row`;
@@ -150,7 +150,6 @@
         const aiBubble = aiMessageRow.querySelector('.ai-bubble');
 
         try {
-
             const response = await fetch('https://al-aasar-ai-portfolio-rag.hf.space/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -167,16 +166,25 @@
                 const { done, value } = await reader.read();
                 if (done) break;
 
-
                 const chunk = decoder.decode(value, { stream: true });
-                aiBubble.innerText += chunk; 
                 
-                chatWindow.scrollTop = chatWindow.scrollHeight;
+                for (let i = 0; i < chunk.length; i++) {
+                    aiBubble.innerText += chunk[i]; 
+                    
+                    let delay = Math.floor(Math.random() * (30 - 15 + 1)) + 15;
+
+                    if (['.', '!', '?', '،', ','].includes(chunk[i])) {
+                        delay = 150; 
+                    }
+
+                    await sleep(delay); 
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
+                }
             }
 
         } catch (error) {
             console.error("Fetch error:", error);
-            aiBubble.innerText = "Error: Connection to server failed. Please ensure the backend is running.";
+            aiBubble.innerText = "Error: Connection to server failed.";
             typingIndicator.style.display = 'none';
         }
     }
